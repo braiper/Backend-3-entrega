@@ -1,0 +1,26 @@
+extends ../layout
+
+block content
+  .card.col-12
+    .card-header
+      h1 Procesar Nueva Venta
+      a.btn.btn-ghost(href="/transacciones/vista") Volver
+    form(action="/transacciones/vista" method="POST")
+      .form-group
+        label Tienda:
+        //- Usamos select iterando sobre la variable "tiendas" que manda el controlador
+        select(name="tienda_id" required)
+          option(value="" disabled selected) -- Seleccione una tienda --
+          each tienda in tiendas
+            option(value=tienda._id)= tienda.nombre_sucursal
+
+      .form-group
+        label Monto Total Real:
+        input(type="number" name="monto_total" required)
+        
+      .form-group
+        label Monto Informado por Pasarela:
+        input(type="number" name="monto_informado_pasarela" required)
+        
+      
+      button.btn.btn-primary(type="submit" style="margin-top: 20px;") Procesar Venta

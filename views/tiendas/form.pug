@@ -1,0 +1,31 @@
+extends ../layout
+
+block content
+  .card.col-12
+    .card-header
+      div
+        h1 Registrar Nueva Tienda
+        p.muted Complete los datos para dar de alta una nueva sucursal.
+      .actions
+        a.btn.btn-ghost(href="/tiendas/vista") Volver al Listado
+
+    //- Formulario que hace un POST a nuestra API de tiendas
+    form( method="POST" action="/tiendas/vista")
+      .form-group
+        label(for="nombre_sucursal") Nombre de la Sucursal:
+        input#nombre_sucursal(type="text" name="nombre_sucursal" required placeholder="Ej: Sucursal Centro")
+
+      .form-group
+        label(for="comercio_id") Comercio Dueño:
+        select#comercio_id(name="comercio_id" required)
+          option(value="" disabled selected) -- Seleccione un comercio --
+          each comercio in (comercios || [])
+            //- El usuario ve el nombre, pero el sistema guarda el _id
+            option(value=comercio._id)= comercio.nombre_comercio
+
+      .form-group
+        label(for="ubicacion") Ubicación:
+        input#ubicacion(type="text" name="ubicacion" required placeholder="Ej: Córdoba")
+
+      div(style="margin-top: 20px;")
+        button.btn.btn-primary(type="submit") Guardar Tienda

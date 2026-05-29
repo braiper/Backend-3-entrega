@@ -1,0 +1,26 @@
+extends ../layout
+
+block content
+  .card.col-12
+    .card-header
+      h1 Crear Nuevo Envío
+      a.btn.btn-ghost(href="/logistica/vista") Volver
+    form( method="POST" action="/logistica/vista")
+      .form-group
+        label Transacción Asociada:
+        //- Menú desplegable dinámico para elegir la transacción
+        select(name="transaccion_id" required)
+          option(value="" disabled selected) -- Seleccione una transacción --
+          each transaccion in transacciones
+            //- Mostramos el ID y el monto para que sea más fácil identificarla
+            option(value=transaccion._id) Venta ID: #{transaccion._id} - Monto: $#{transaccion.monto_total}
+            
+      .form-group
+        label Empresa de Transporte:
+        input(type="text" name="empresa_transporte" required placeholder="Ej: Correo Argentino")
+        
+      .form-group
+        label Dirección de Destino:
+        input(type="text" name="direccion_destino" required placeholder="Ej: Av. Corrientes 1234")
+        
+      button.btn.btn-primary(type="submit" style="margin-top: 20px;") Crear Envío

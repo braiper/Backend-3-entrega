@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "nombre": "Juan",
+    "email": "juan@techretail.com",
+    "rol": "Administrador",
+    "estado": "Activo"
+  },
+  {
+    "id": 2,
+    "nombre": "Pepo",
+    "email": "pep@ss.com",
+    "rol": "Administrador",
+    "estado": "Activo"
+  },
+  {
+    "id": 1777931093285,
+    "nombre_empleado": "Juan",
+    "email_corporativo": "juan@techretail.com"
+  },
+  {
+    "id": 1777931093286,
+    "nombre": "Juan Perez",
+    "email": "juan.perez@techretail.com",
+    "rol": "Activo",
+    "estado": "Activo"
+  }
+]

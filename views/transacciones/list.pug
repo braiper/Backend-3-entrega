@@ -1,0 +1,39 @@
+extends ../layout
+
+block content
+  .card.col-12
+    .card-header
+      h1 Transacciones
+      a.btn.btn-ghost(href="/") Volver al Panel
+    table
+      thead
+        tr
+          th ID
+          th Tienda Asociada
+          th Monto Total
+          th Monto Pasarela
+          th Estado Conciliación
+          th Observación
+      tbody
+        each transaccion in transacciones
+          tr
+            //- Cambiamos .id por ._id
+            td= transaccion._id
+            //- Cambiamos .id_tienda por .tienda_id
+            td
+              if transaccion.tienda_id && transaccion.tienda_id.nombre_sucursal
+                | #{transaccion.tienda_id.nombre_sucursal}
+              else
+                span.muted Sin tienda asignada
+            td= transaccion.monto_total
+            td= transaccion.monto_informado_pasarela
+            td
+              - const estado = (transaccion.estado_conciliacion ?? "").toString()
+              - const estadoLower = estado.toLowerCase()
+              if estadoLower.includes("ok")
+                span.badge.badge-success= estado
+              else if estadoLower.includes("incons") || estadoLower.includes("difer") || estadoLower.includes("problema")
+                span.badge.badge-danger= estado
+              else
+                span.badge= estado
+            td.small= transaccion.observacion

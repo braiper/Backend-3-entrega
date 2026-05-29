@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "nombre_comercio": "Eco Zapatillas",
+    "cuit": "30-12345678-9",
+    "email_contacto": "ventas@ecozapatillas.com",
+    "plan_suscripcion": "Básico",
+    "comision_variable": 0.05,
+    "estado": "Activo"
+  },
+  {
+    "id": 2,
+    "nombre_comercio": "Mascotas Felices",
+    "cuit": "30-98765432-1",
+    "email_contacto": "hola@mascotasfelices.com",
+    "plan_suscripcion": "Basico",
+    "comision_variable": 0.08,
+    "estado": "Inactivo"
+  },
+  {
+    "id": 3,
+    "nombre_comercio": "Tienda de Prueba",
+    "cuit": "30-11111111-1",
+    "email_contacto": "prueba@test.com",
+    "plan_suscripcion": "Premium",
+    "comision_variable": 0.08,
+    "estado": "Activo"
+  },
+  {
+    "id": 4,
+    "nombre_comercio": "Eco Zapatillas",
+    "cuit": "30-12345678-9",
+    "email_contacto": "ventas@ecozapatillas.com",
+    "plan_suscripcion": "Premium",
+    "comision_variable": 0.05,
+    "estado": "Activo"
+  },
+  {
+    "id": 5,
+    "nombre_comercio": "Joldo",
+    "cuit": "272333333321",
+    "email_contacto": "dd@dd.com",
+    "plan_suscripcion": "Basico",
+    "comision_variable": 0.05,
+    "estado": "Activo"
+  },
+  {
+    "id": 6,
+    "nombre_comercio": "Sacoa",
+    "cuit": "343244342543",
+    "email_contacto": "fgfg@fff.com",
+    "plan_suscripcion": "Basico",
+    "comision_variable": 0.06,
+    "estado": "Activo"
+  },
+  {
+    "id": 7,
+    "nombre_comercio": "Vete Colitas Felices",
+    "cuit": "30968558741",
+    "email_contacto": "colitas@mail.com",
+    "plan_suscripcion": "Basico",
+    "comision_variable": 0.05,
+    "estado": "Activo"
+  },
+  {
+    "id": 8,
+    "nombre_comercio": "Eco Zapatillas",
+    "cuit": "30-12345678-9",
+    "email_contacto": "contacto@ecozapatillas.com",
+    "plan_suscripcion": "Premium",
+    "comision_variable": 0.05,
+    "estado": "Activo"
+  }
+]

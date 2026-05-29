@@ -1,0 +1,25 @@
+extends ../layout
+
+block content
+  .card.col-12
+    .card-header
+      h1 Crear Nuevo Usuario
+      a.btn.btn-ghost(href="/usuarios/vista") Volver
+    form(action="/usuarios/vista" method="POST")
+      .form-group
+        label Nombre del Empleado:
+        input(type="text" name="nombre" required placeholder="Ej: Juan Pérez")
+        
+      .form-group
+        label Email Corporativo:
+        input(type="email" name="email" required placeholder="Ej: juan@techretail.com")
+        
+      .form-group
+        label Rol del Sistema:
+        select(name="rol" required)
+          option(value="" disabled selected) -- Seleccione un rol --
+          option(value="Administrador") Administrador
+          option(value="Supervisor") Supervisor
+          option(value="Operador") Operador
+          
+      button.btn.btn-primary(type="submit" style="margin-top: 20px;") Crear Usuario

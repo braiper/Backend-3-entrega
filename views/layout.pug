@@ -1,0 +1,335 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title TechRetail Solutions
+    style.
+      :root {
+        --bg: #f4f6f8;
+        --surface: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --primary: #0d47a1;
+        --primary-2: #1565c0;
+        --border: rgba(17, 24, 39, .12);
+        --shadow: 0 10px 30px rgba(17, 24, 39, .10);
+        --shadow-sm: 0 2px 10px rgba(17, 24, 39, .08);
+        --radius: 14px;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        margin: 0;
+        background: radial-gradient(900px 400px at 20% 0%, rgba(13, 71, 161, .14), transparent 60%),
+                    radial-gradient(900px 400px at 80% 0%, rgba(21, 101, 192, .12), transparent 60%),
+                    var(--bg);
+        color: var(--text);
+      }
+
+      .container {
+        width: min(1100px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(244, 246, 248, .75);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .site-header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 0;
+        gap: 18px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        letter-spacing: .2px;
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 18px;
+      }
+
+      .brand-badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--primary), var(--primary-2));
+        box-shadow: var(--shadow-sm);
+        color: white;
+        font-size: 14px;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .nav-link {
+        padding: 8px 10px;
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        border: 1px solid transparent;
+      }
+
+      .nav-link:hover {
+        background: rgba(13, 71, 161, .08);
+        border-color: rgba(13, 71, 161, .18);
+      }
+
+      .site-main {
+        padding: 26px 0 34px;
+      }
+
+      h1, h2, h3 {
+        margin: 0 0 12px;
+        letter-spacing: -.2px;
+      }
+
+      h1 { font-size: 28px; }
+      h2 { font-size: 20px; }
+      h3 { font-size: 16px; }
+
+      p {
+        margin: 0 0 12px;
+        color: var(--text);
+        line-height: 1.55;
+      }
+
+      .muted { color: var(--muted); }
+
+      .card {
+        background: var(--surface);
+        padding: 18px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .card + .card { margin-top: 14px; }
+
+      .card-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: white;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .btn:hover {
+        border-color: rgba(13, 71, 161, .30);
+        box-shadow: 0 8px 18px rgba(13, 71, 161, .10);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-2));
+        color: white;
+        border-color: rgba(13, 71, 161, .25);
+      }
+
+      .btn-primary:hover {
+        box-shadow: 0 12px 28px rgba(13, 71, 161, .22);
+      }
+
+      .btn-ghost {
+        background: rgba(13, 71, 161, .06);
+        border-color: rgba(13, 71, 161, .12);
+        color: var(--primary);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        border: 1px solid var(--border);
+        background: rgba(17, 24, 39, .03);
+      }
+
+      .badge-success {
+        background: rgba(16, 185, 129, .12);
+        border-color: rgba(16, 185, 129, .22);
+        color: #065f46;
+      }
+
+      .badge-danger {
+        background: rgba(239, 68, 68, .10);
+        border-color: rgba(239, 68, 68, .22);
+        color: #7f1d1d;
+      }
+
+      .status-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        vertical-align: middle;
+      }
+
+      .status-dot--active {
+        background: rgba(16, 185, 129, .95);
+        border-color: rgba(16, 185, 129, .55);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, .12);
+      }
+
+      .status-dot--inactive {
+        background: rgba(239, 68, 68, .95);
+        border-color: rgba(239, 68, 68, .55);
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, .10);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 14px;
+      }
+
+      .col-6 { grid-column: span 6; }
+      .col-12 { grid-column: span 12; }
+
+      @media (max-width: 720px) {
+        .col-6 { grid-column: span 12; }
+      }
+
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        overflow: hidden;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: white;
+      }
+
+      th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid rgba(17, 24, 39, .08);
+        vertical-align: top;
+      }
+
+      th {
+        font-size: 12px;
+        letter-spacing: .35px;
+        text-transform: uppercase;
+        color: var(--muted);
+        background: rgba(17, 24, 39, .02);
+      }
+
+      tr:last-child td { border-bottom: none; }
+
+      .table-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      form {
+        display: grid;
+        gap: 12px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 12px;
+      }
+
+      .field {
+        display: grid;
+        gap: 6px;
+        grid-column: span 6;
+      }
+
+      .field-full { grid-column: span 12; }
+
+      label {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 700;
+        letter-spacing: .2px;
+      }
+
+      input, select {
+        width: 100%;
+        padding: 11px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: white;
+        outline: none;
+      }
+
+      input:focus, select:focus {
+        border-color: rgba(13, 71, 161, .35);
+        box-shadow: 0 0 0 4px rgba(13, 71, 161, .12);
+      }
+
+      .footer {
+        padding: 22px 0 26px;
+        color: var(--muted);
+        font-size: 13px;
+        border-top: 1px solid var(--border);
+      }
+
+body
+    header.site-header
+      .container
+        .site-header-inner
+          a.brand(href="/")
+          
+            img(src='/logodev.jpeg', alt='Logo DeveloPET Friendly', width='150')
+            span.brand-badge TR
+            span TechRetail Solutions
+          nav.nav
+            a.nav-link(href="/") Inicio
+            a.nav-link(href="/comercios/vista") Comercios
+    main.site-main
+      .container
+
+        block content
+    footer.footer
+      .container
+        span TechRetail Solutions — Panel de administración

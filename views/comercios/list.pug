@@ -1,0 +1,37 @@
+extends ../layout
+
+block content
+  .card
+    .card-header
+      div
+        h2 Lista de Comercios
+        p.muted Alta, baja y consulta de comercios registrados.
+      .actions
+        a.btn.btn-primary(href="/comercios/nuevo") + Nuevo Comercio
+        a.btn(href="/") Volver al inicio
+
+    table
+      thead
+        tr
+          th Nombre
+          th CUIT
+          th Plan
+          th Estado
+          th Acciones
+      tbody
+        each comercio in comercios
+          tr
+            td
+              strong #{comercio.nombre_comercio}
+              if comercio.email_contacto
+                div.muted #{comercio.email_contacto}
+            td #{comercio.cuit}
+            td #{comercio.plan_suscripcion}
+            td
+              if comercio.estado === "Activo"
+                span.badge.badge-success #{comercio.estado}
+              else
+                span.badge.badge-danger #{comercio.estado}
+            td
+              .table-actions
+                a.btn(href=`/comercios/vista/${comercio._id}`) Ver detalle

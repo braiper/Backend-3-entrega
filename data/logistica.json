@@ -1,0 +1,48 @@
+[
+  {
+    "id": 1,
+    "transaccion_id": 1,
+    "estado_envio": "Pendiente de despacho",
+    "empresa_transporte": "Envío Rápido S.A.",
+    "direccion_destino": "Av. Corrientes 1234, Buenos Aires",
+    "fecha_creacion": "2026-04-15T13:56:11.874Z"
+  },
+  {
+    "id": 2,
+    "transaccion_id": 2,
+    "estado_envio": "Pendiente de despacho",
+    "empresa_transporte": "Pepe",
+    "direccion_destino": "dddd",
+    "fecha_creacion": "2026-04-16T23:53:03.564Z"
+  },
+  {
+    "id": 3,
+    "transaccion_id": 4,
+    "estado_envio": "Pendiente de despacho",
+    "empresa_transporte": "PEs",
+    "direccion_destino": "Note",
+    "fecha_creacion": "2026-04-17T12:49:28.048Z"
+  },
+  {
+    "id": 4,
+    "transaccion_id": 1,
+    "estado_envio": "Envío Rápido S.A.",
+    "empresa_transporte": "Av. Corrientes 1234, Buenos Aires"
+  },
+  {
+    "id": 5,
+    "transaccion_id": 1,
+    "estado_envio": "Pendiente de despacho",
+    "empresa_transporte": "Lolo S.A.",
+    "direccion_destino": "Av. Corrientes 1234, Buenos Aires",
+    "fecha_creacion": "2026-04-25T17:30:14.183Z"
+  },
+  {
+    "id": 6,
+    "transaccion_id": 1,
+    "estado_envio": "Envío Rápido S.A.",
+    "empresa_transporte": "Av. Corrientes 1234, Buenos Aires",
+    "direccion_destino": "Pendiente",
+    "fecha_creacion": "Activa"
+  }
+]

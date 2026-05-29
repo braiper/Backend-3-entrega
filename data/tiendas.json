@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1,
+    "nombre": "Sucursal Centro",
+    "comercio_id": 1,
+    "ubicacion": "Córdoba",
+    "estado": "Activa"
+  },
+  {
+    "id": 2,
+    "nombre": "Sucursal Centro",
+    "comercio_id": 1,
+    "ubicacion": "Córdoba",
+    "estado": "Inactiva"
+  },
+  {
+    "id": 3,
+    "nombre": "ppepe",
+    "comercio_id": 5,
+    "ubicacion": "Pampa",
+    "estado": "Activa"
+  },
+  {
+    "id": 4,
+    "nombre": "Sucursal Centro",
+    "comercio_id": 1,
+    "ubicacion": "Córdoba",
+    "estado": "Activa"
+  },
+  {
+    "id": 5,
+    "nombre": "Juegos",
+    "comercio_id": 6,
+    "ubicacion": "Bs As",
+    "estado": "Activa"
+  },
+  {
+    "id": 6,
+    "nombre": "Sucursal Centro",
+    "comercio_id": 1,
+    "ubicacion": "Córdoba",
+    "estado": "Activa"
+  },
+  {
+    "id": 7,
+    "nombre": "Sucursal Centro",
+    "comercio_id": 1,
+    "ubicacion": "Córdoba",
+    "estado": "Activa"
+  }
+]

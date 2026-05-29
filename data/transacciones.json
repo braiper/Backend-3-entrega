@@ -1,0 +1,279 @@
+[
+  {
+    "id": 1,
+    "tienda_id": 1,
+    "comercio_id": 1,
+    "fecha": "2026-04-15T13:15:55.405Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 2,
+    "tienda_id": 1,
+    "comercio_id": 1,
+    "fecha": "2026-04-15T13:16:26.461Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 9800,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Inconsistencia Detectada",
+    "observacion": "Alerta: La pasarela informó una diferencia de $200 (2.00%)"
+  },
+  {
+    "id": 3,
+    "tienda_id": 3,
+    "comercio_id": 5,
+    "fecha": "2026-04-16T23:52:42.682Z",
+    "monto_total": 1222,
+    "monto_informado_pasarela": 1222,
+    "split_pagos": {
+      "comision_techretail": 61.1,
+      "ingreso_comercio": 1160.9
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 4,
+    "tienda_id": 5,
+    "comercio_id": 6,
+    "fecha": "2026-04-17T12:48:55.789Z",
+    "monto_total": 56000,
+    "monto_informado_pasarela": 55000,
+    "split_pagos": {
+      "comision_techretail": 3360,
+      "ingreso_comercio": 52640
+    },
+    "estado_conciliacion": "Inconsistencia Detectada",
+    "observacion": "Alerta: La pasarela informó una diferencia de $1000 (1.79%)"
+  },
+  {
+    "id": 5,
+    "tienda_id": 1,
+    "comercio_id": null,
+    "fecha": "2026-04-26T17:24:46.875Z",
+    "monto_total": null,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": null,
+      "ingreso_comercio": null
+    },
+    "estado_conciliacion": "Inconsistencia Detectada",
+    "observacion": "Alerta: La pasarela informó una diferencia de $NaN (NaN%)"
+  },
+  {
+    "id": 6,
+    "tienda_id": 1,
+    "comercio_id": null,
+    "fecha": "2026-04-26T17:25:10.778Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 7,
+    "tienda_id": 1,
+    "comercio_id": null,
+    "fecha": "2026-04-26T17:41:25.158Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 8,
+    "tienda_id": 1,
+    "fecha": "2026-04-26T17:51:16.120Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 9,
+    "tienda_id": 2,
+    "fecha": "2026-04-26T17:51:33.241Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 10,
+    "tienda_id": 2,
+    "fecha": "2026-04-26T17:51:42.141Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 11,
+    "tienda_id": 2,
+    "comercio_id": 1,
+    "fecha": "2026-04-26T17:57:15.694Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 12,
+    "tienda_id": 6,
+    "comercio_id": 1,
+    "fecha": "2026-04-26T17:57:30.105Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 13,
+    "tienda_id": 6,
+    "comercio_id": 1,
+    "fecha": "2026-04-26T17:57:54.475Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 14,
+    "tienda_id": 6,
+    "comercio_id": 1,
+    "fecha": "2026-04-26T17:58:06.891Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 15,
+    "tienda_id": 6,
+    "comercio_id": 1,
+    "fecha": "2026-04-26T17:58:07.916Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 16,
+    "tienda_id": 6,
+    "comercio_id": 1,
+    "fecha": "2026-04-26T17:58:08.786Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 17,
+    "tienda_id": 6,
+    "comercio_id": 1,
+    "fecha": "2026-04-26T17:58:17.522Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 18,
+    "tienda_id": 5,
+    "comercio_id": 6,
+    "fecha": "2026-04-26T17:59:41.310Z",
+    "monto_total": null,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": null,
+      "ingreso_comercio": null
+    },
+    "estado_conciliacion": "Inconsistencia Detectada",
+    "observacion": "Alerta: La pasarela informó una diferencia de $NaN (NaN%)"
+  },
+  {
+    "id": 19,
+    "tienda_id": 1,
+    "comercio_id": null,
+    "fecha": "2026-05-04T21:49:03.976Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  },
+  {
+    "id": 20,
+    "tienda_id": 1,
+    "comercio_id": null,
+    "fecha": "2026-05-04T22:10:16.023Z",
+    "monto_total": 10000,
+    "monto_informado_pasarela": 10000,
+    "split_pagos": {
+      "comision_techretail": 500,
+      "ingreso_comercio": 9500
+    },
+    "estado_conciliacion": "Conciliado OK",
+    "observacion": "Sin diferencias en el flujo monetario"
+  }
+]

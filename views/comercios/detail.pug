@@ -1,0 +1,39 @@
+extends ../layout
+
+block content
+  .card
+    .card-header
+      div
+        h2 Detalle del Comercio
+        p.muted Información registrada del comercio.
+      .actions
+        a.btn(href="/comercios/vista") Volver al listado
+        a.btn.btn-ghost(href="/") Inicio
+
+    table
+      tbody
+        tr
+          th ID
+          td #{comercio._id}
+        tr
+          th Nombre
+          td #{comercio.nombre_comercio}
+        tr
+          th CUIT
+          td #{comercio.cuit}
+        tr
+          th Email
+          td #{comercio.email_contacto}
+        tr
+          th Plan
+          td #{comercio.plan_suscripcion}
+        tr
+          th Comisión
+          td #{comercio.comision_variable}
+        tr
+          th Estado
+          td
+            if comercio.estado === "Activo"
+              span.badge.badge-success #{comercio.estado}
+            else
+              span.badge.badge-danger #{comercio.estado}
