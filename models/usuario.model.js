@@ -15,6 +15,8 @@ const usuarioSchema = new mongoose.Schema({
         lowercase: true,
         match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     },
+    password: { type: String, required: true },
+    
     rol: { 
         type: String, 
         required: true,

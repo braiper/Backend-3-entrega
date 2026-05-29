@@ -1,5 +1,6 @@
 import express from "express";
 import conectarDB from "./config/db.js";
+import 'dotenv/config'; 
 
 // 1. Agregamos las importaciones para manejar rutas absolutas en ES Modules
 import path from "path";

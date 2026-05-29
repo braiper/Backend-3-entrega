@@ -1,4 +1,5 @@
 import Usuario from "../models/usuario.model.js";
+import bcrypt from "bcrypt";
 
 // ==========================================
 // RUTAS API REST
@@ -23,11 +24,28 @@ const obtenerUsuarioPorId = async (req, res) => {
 
 const crearUsuario = async (req, res) => {
     try {
-        const nuevoUsuario = new Usuario(req.body);
+        // 1. Separamos la contraseña del resto de los datos que vienen del formulario Pug
+        const { password, ...restoDeDatos } = req.body;
+
+        // 2. Encriptamos la clave usando bcrypt con un "salt" de 10 rondas
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        // 3. Armamos el nuevo usuario con los datos originales, pero con la clave ya encriptada
+        const nuevoUsuario = new Usuario({
+            ...restoDeDatos,
+            password: passwordHash
+        });
+
+        // 4. Guardamos el usuario seguro en MongoDB Atlas
         await nuevoUsuario.save();
-        res.status(201).json(nuevoUsuario);
+
+        // 5. Como estás viniendo desde una vista Pug, probablemente quieras redirigir al listado:
+        res.redirect("/usuarios/vista"); 
+        
+        // (Si estabas usando JSON para devolver una respuesta, usa: res.status(201).json(nuevoUsuario); )
+
     } catch (error) {
-        res.status(400).json({ error: "Error al crear usuario" });
+        res.status(400).json({ error: "Error al crear usuario: " + error.message });
     }
 };
 
@@ -66,19 +84,69 @@ const formularioNuevoUsuario = (req, res) => {
 };
 
 const crearUsuarioVista = async (req, res) => {
-   try {
-      const nuevoUsuario = new Usuario(req.body);
+    try {
+        // 1. Separamos la contraseña del resto de los datos del formulario Pug
+        const { password, ...restoDeDatos } = req.body;
 
-      await nuevoUsuario.save();
+        // 2. Encriptamos la clave usando bcrypt
+        const passwordHash = await bcrypt.hash(password, 10);
 
-      res.redirect("/usuarios/vista");
+        // 3. Armamos el nuevo usuario uniendo todo
+        const nuevoUsuario = new Usuario({
+            ...restoDeDatos,
+            password: passwordHash
+        });
 
-   } catch (error) {
-      res.status(400).send("Error...");
-   }
+        // 4. Guardamos en Atlas
+        await nuevoUsuario.save();
+
+        // 5. Redirigimos de vuelta a la vista de la tabla
+        res.redirect("/usuarios/vista"); 
+    } catch (error) {
+        res.status(400).send("Error al crear usuario desde la vista: " + error.message);
+    }
+};
+
+
+
+const loginUsuario = async (req, res) => {
+    try {
+        // 1. Recibimos el email y la clave en texto plano desde el formulario o Thunder Client
+        const { email, password } = req.body;
+
+        // 2. Buscamos en la base de datos si existe algún usuario con ese email exacto
+        const usuarioEncontrado = await Usuario.findOne({ email: email });
+        
+        if (!usuarioEncontrado) {
+            return res.status(404).json({ error: "El usuario no existe en el sistema" });
+        }
+
+        // 3. Comparamos la contraseña en texto plano con el hash guardado usando bcrypt.compare()
+        // Esta función devuelve un booleano (true o false)
+        const passwordValida = await bcrypt.compare(password, usuarioEncontrado.password);
+
+        if (!passwordValida) {
+            return res.status(401).json({ error: "Credenciales incorrectas" }); // Error 401: No autorizado
+        }
+
+        // 4. Si todo es correcto, el login es exitoso
+        // (Por seguridad, devolvemos los datos del usuario SIN incluir el password)
+        res.status(200).json({
+            mensaje: "¡Login exitoso!",
+            usuario: {
+                _id: usuarioEncontrado._id,
+                nombre: usuarioEncontrado.nombre,
+                email: usuarioEncontrado.email,
+                rol: usuarioEncontrado.rol
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: "Error interno del servidor al intentar iniciar sesión: " + error.message });
+    }
 };
 
 export {
     obtenerUsuarios, obtenerUsuarioPorId, crearUsuario, actualizarUsuario, eliminarUsuario,
-    obtenerUsuariosVista, formularioNuevoUsuario, crearUsuarioVista
+    obtenerUsuariosVista, formularioNuevoUsuario, crearUsuarioVista,loginUsuario
 };
