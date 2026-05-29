@@ -1,5 +1,6 @@
 import Usuario from "../models/usuario.model.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 // ==========================================
 // RUTAS API REST
@@ -129,12 +130,22 @@ const loginUsuario = async (req, res) => {
             return res.status(401).json({ error: "Credenciales incorrectas" }); // Error 401: No autorizado
         }
 
-        // 4. Si todo es correcto, el login es exitoso
-        // (Por seguridad, devolvemos los datos del usuario SIN incluir el password)
+// --- ¡NUEVO: GENERACIÓN DEL TOKEN JWT! ---
+        // jwt.sign recibe 3 cosas: los datos a guardar (payload), la clave secreta, y el tiempo de expiración
+        const token = jwt.sign(
+            { 
+                id: usuarioEncontrado._id, 
+                rol: usuarioEncontrado.rol 
+            }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '2h' } // El token caducará en 2 horas por seguridad
+        );
+
+        // Devolvemos el token al cliente junto con el mensaje
         res.status(200).json({
             mensaje: "¡Login exitoso!",
+            token: token, // ¡Acá enviamos el pase VIP!
             usuario: {
-                _id: usuarioEncontrado._id,
                 nombre: usuarioEncontrado.nombre,
                 email: usuarioEncontrado.email,
                 rol: usuarioEncontrado.rol
