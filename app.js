@@ -21,6 +21,7 @@ import estadisticasRoutes from "./routes/estadisticas.routes.js";
 import logisticaRoutes from "./routes/logistica.routes.js";
 import usuariosRoutes from "./routes/usuarios.routes.js";
 import alertasRoutes from "./routes/alertas.routes.js";
+import testsRoutes from "./routes/tests.routes.js";
 import cookieParser from "cookie-parser";
 
 // MIDDLEWARES INCORPORADOS
@@ -72,6 +73,7 @@ app.use("/estadisticas", estadisticasRoutes);
 app.use("/logistica", logisticaRoutes);
 app.use("/usuarios", usuariosRoutes);
 app.use("/alertas", alertasRoutes);
+app.use("/tests", testsRoutes);
 
 // MIDDLEWARE PERSONALIZADO 2: Manejo de Error 404 sin rutas
 app.use((req, res, next) => {

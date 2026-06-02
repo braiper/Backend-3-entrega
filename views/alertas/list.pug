@@ -1,9 +1,13 @@
 extends ../layout
 
 block content
-  .card-header
-    h1 Panel de Alertas e Interoperabilidad
-    p.muted Monitoreo de tickets, pasarelas de pago y salud financiera.
+  .card-header(style="display: flex; justify-content: space-between; align-items: flex-start;")
+    div
+      h1 Panel de Alertas e Interoperabilidad
+      p.muted Monitoreo de tickets, pasarelas de pago y salud financiera.
+    div
+      if usuario && usuario.rol === 'Administrador'
+        a.btn.btn-ghost(href="/tests/health" style="color: #10b981; font-weight: 600; border-color: rgba(16,185,129,0.2); background: rgba(16,185,129,0.05);") 💻 System Health & Tests
 
   // DASHBOARD DE MÉTRICAS
   .grid(style="margin-bottom: 24px;")
@@ -44,7 +48,12 @@ block content
                   span.badge.badge-success Resuelta
               td
                 strong #{alerta.tipo}
-              td #{alerta.mensaje}
+              td
+                div(style="margin-bottom: 4px;") #{alerta.mensaje}
+                if alerta.transaccion_id
+                  a(href=`/transacciones/vista/${alerta.transaccion_id._id}` style="font-size: 12px; font-weight: 600; color: var(--primary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;") 
+                    span 🔍 
+                    span Ver Transacción (Total: $#{alerta.transaccion_id.monto_total})
               td
                 if alerta.prioridad === 'Alta'
                   span.badge(style="background: #fee2e2; color: #b91c1c;") Alta

@@ -5,7 +5,7 @@ import Alerta from "../models/alerta.model.js";
 // ==========================================
 const obtenerAlertasVista = async (req, res) => {
     try {
-        const alertas = await Alerta.find().sort({ fecha: -1 }).lean();
+        const alertas = await Alerta.find().populate("transaccion_id").sort({ fecha: -1 }).lean();
         
         // Count for dashboard
         const pendientes = alertas.filter(a => a.estado === 'Pendiente').length;
@@ -32,7 +32,7 @@ const resolverAlertaVista = async (req, res) => {
 // ==========================================
 const obtenerAlertas = async (req, res) => {
     try {
-        const alertas = await Alerta.find().sort({ fecha: -1 });
+        const alertas = await Alerta.find().populate("transaccion_id").sort({ fecha: -1 });
         res.json(alertas);
     } catch (error) {
         res.status(500).json({ error: "Error al obtener alertas" });
