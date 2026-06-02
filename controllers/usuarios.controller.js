@@ -110,6 +110,63 @@ const crearUsuarioVista = async (req, res) => {
 
 
 
+
+
+
+
+// GET - Renderiza el formulario de Login
+const mostrarLogin = (req, res) => {
+    res.render("usuarios/login");
+};
+
+// POST - Procesa el formulario, valida y guarda la Cookie
+const procesarLoginVista = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // 1. Buscamos el usuario
+        const usuarioEncontrado = await Usuario.findOne({ email: email });
+        if (!usuarioEncontrado) {
+            return res.render("usuarios/login", { error: "El correo o la clave son incorrectos" });
+        }
+
+        // 2. Comparamos contraseñas con bcrypt
+        const passwordValida = await bcrypt.compare(password, usuarioEncontrado.password);
+        if (!passwordValida) {
+            return res.render("usuarios/login", { error: "El correo o la clave son incorrectos" });
+        }
+
+        // 3. Generamos el pase VIP (JWT)
+        const token = jwt.sign(
+            { id: usuarioEncontrado._id, rol: usuarioEncontrado.rol, nombre: usuarioEncontrado.nombre }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '2h' }
+        );
+
+        // 4. ¡AQUÍ ESTÁ LA DIFERENCIA! Guardamos el token en una Cookie del navegador
+        res.cookie("jwt_token", token, {
+            httpOnly: true, // Seguridad extra: evita que un hacker lea la cookie con JavaScript
+            maxAge: 2 * 60 * 60 * 1000 // La cookie dura 2 horas (en milisegundos)
+        });
+
+        // 5. Redirigimos al panel de usuarios
+        res.redirect("/usuarios/vista");
+
+    } catch (error) {
+        res.render("usuarios/login", { error: "Ocurrió un error en el servidor" });
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
 const loginUsuario = async (req, res) => {
     try {
         // 1. Recibimos el email y la clave en texto plano desde el formulario o Thunder Client
@@ -135,7 +192,8 @@ const loginUsuario = async (req, res) => {
         const token = jwt.sign(
             { 
                 id: usuarioEncontrado._id, 
-                rol: usuarioEncontrado.rol 
+                rol: usuarioEncontrado.rol,
+                nombre: usuarioEncontrado.nombre
             }, 
             process.env.JWT_SECRET, 
             { expiresIn: '2h' } // El token caducará en 2 horas por seguridad
@@ -152,12 +210,29 @@ const loginUsuario = async (req, res) => {
             }
         });
 
+
+
+
+
+
+
     } catch (error) {
         res.status(500).json({ error: "Error interno del servidor al intentar iniciar sesión: " + error.message });
     }
 };
 
+const logoutVista = (req, res) => {
+    res.clearCookie("jwt_token");
+    res.redirect("/usuarios/login-vista");
+};
+
+const logoutApi = (req, res) => {
+    res.clearCookie("jwt_token");
+    res.status(200).json({ mensaje: "Sesión cerrada correctamente. Recuerda eliminar el token de los headers en Thunder Client." });
+};
+
 export {
     obtenerUsuarios, obtenerUsuarioPorId, crearUsuario, actualizarUsuario, eliminarUsuario,
-    obtenerUsuariosVista, formularioNuevoUsuario, crearUsuarioVista,loginUsuario
+    obtenerUsuariosVista, formularioNuevoUsuario, crearUsuarioVista,loginUsuario,mostrarLogin,procesarLoginVista,
+    logoutVista, logoutApi
 };

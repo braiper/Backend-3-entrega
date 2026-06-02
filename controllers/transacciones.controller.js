@@ -1,6 +1,7 @@
 import Transaccion from "../models/transaccion.model.js";
 import Tienda from "../models/tienda.model.js";
 import Comercio from "../models/comercio.model.js";
+import Alerta from "../models/alerta.model.js";
 
 // ==========================================
 // RUTAS API CRUD CON MONGODB
@@ -80,6 +81,19 @@ const crearTransaccion = async (req, res) => {
         });
 
         await nuevaTransaccion.save();
+
+        // 6. Si hubo diferencias, disparar una Alerta en el sistema
+        if (estadoConciliacion === "Con Diferencias") {
+            const nuevaAlerta = new Alerta({
+                tipo: "Financiera",
+                mensaje: `Discrepancia detectada en transacción de tienda ${tienda.nombre_sucursal}. Total: $${monto_total} vs Pasarela: $${monto_informado_pasarela}.`,
+                estado: "Pendiente",
+                prioridad: "Alta",
+                transaccion_id: nuevaTransaccion._id
+            });
+            await nuevaAlerta.save();
+        }
+
         res.status(201).json(nuevaTransaccion);
 
     } catch (error) {
@@ -229,6 +243,18 @@ const crearTransaccionVista = async (req, res) => {
         });
 
         await nuevaTransaccion.save();
+
+        // Si hubo diferencias, generar la Alerta automáticamente para el panel
+        if (estadoConciliacion === "Con Diferencias") {
+            const nuevaAlerta = new Alerta({
+                tipo: "Financiera",
+                mensaje: `Discrepancia detectada en transacción de tienda ${tienda.nombre_sucursal}. Total: $${monto_total} vs Pasarela: $${monto_informado_pasarela}.`,
+                estado: "Pendiente",
+                prioridad: "Alta",
+                transaccion_id: nuevaTransaccion._id
+            });
+            await nuevaAlerta.save();
+        }
 
         res.redirect("/transacciones/vista");
 

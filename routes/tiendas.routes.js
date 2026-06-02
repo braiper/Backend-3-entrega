@@ -10,6 +10,8 @@ import {
     formularioNuevaTienda,
     crearTiendaVista
 } from "../controllers/tiendas.controller.js";
+import verificarToken from "../middlewares/auth.middleware.js";
+import verificarRol from "../middlewares/role.middleware.js";
 
 const router = express.Router();
 
@@ -63,18 +65,18 @@ const validateTiendaUpdate = (req, res, next) => {
 // ==========================================
 // RUTAS PARA LAS VISTAS PUG (Front-end)
 // ==========================================
-router.get("/vista", obtenerTiendasVista);
-router.get("/nuevo", formularioNuevaTienda);
-router.get("/vista/:id", validateIdParam, obtenerTiendaVista);
-router.post("/vista", validateTiendaCreate, crearTiendaVista);
+router.get("/vista", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), obtenerTiendasVista);
+router.get("/nuevo", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), formularioNuevaTienda);
+router.get("/vista/:id", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), validateIdParam, obtenerTiendaVista);
+router.post("/vista", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), validateTiendaCreate, crearTiendaVista);
 
 // ==========================================
 // RUTAS API REST (Endpoints para Thunder Client)
 // ==========================================
-router.get("/", obtenerTiendas);
-router.get("/:id", validateIdParam, obtenerTiendaPorId);
-router.post("/", validateTiendaCreate, crearTienda);
-router.put("/:id", validateIdParam, validateTiendaUpdate, actualizarTienda);
-router.delete("/:id", validateIdParam, eliminarTienda);
+router.get("/", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), obtenerTiendas);
+router.get("/:id", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), validateIdParam, obtenerTiendaPorId);
+router.post("/", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), validateTiendaCreate, crearTienda);
+router.put("/:id", verificarToken, verificarRol(["Administrador", "Supervisor"]), validateIdParam, validateTiendaUpdate, actualizarTienda);
+router.delete("/:id", verificarToken, verificarRol(["Administrador"]), validateIdParam, eliminarTienda);
 
 export default router;

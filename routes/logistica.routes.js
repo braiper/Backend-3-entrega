@@ -10,6 +10,8 @@ import {
     formularioNuevoEnvio,
     crearEnvioVista
 } from "../controllers/logistica.controller.js";
+import verificarToken from "../middlewares/auth.middleware.js";
+import verificarRol from "../middlewares/role.middleware.js";
 
 const router = express.Router();
 
@@ -63,18 +65,18 @@ const validateEnvioUpdate = (req, res, next) => {
 // ==========================================
 // RUTAS PARA LAS VISTAS PUG (Front-end)
 // ==========================================
-router.get("/vista", obtenerEnviosVista);
-router.get("/nuevo", formularioNuevoEnvio);
-router.get("/vista/:id", validateIdParam, obtenerEnvioVista);
-router.post("/vista", validateEnvioCreate, crearEnvioVista);
+router.get("/vista", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), obtenerEnviosVista);
+router.get("/nuevo", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), formularioNuevoEnvio);
+router.get("/vista/:id", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), validateIdParam, obtenerEnvioVista);
+router.post("/vista", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), validateEnvioCreate, crearEnvioVista);
 
 // ==========================================
 // RUTAS API REST (Endpoints para Thunder Client)
 // ==========================================
-router.get("/", obtenerEnvios);
-router.get("/:id", validateIdParam, obtenerEnvioPorId);
-router.post("/", validateEnvioCreate, crearEnvio);
-router.put("/:id", validateIdParam, validateEnvioUpdate, actualizarEnvio);
-router.delete("/:id", validateIdParam, eliminarEnvio);
+router.get("/", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), obtenerEnvios);
+router.get("/:id", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), validateIdParam, obtenerEnvioPorId);
+router.post("/", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), validateEnvioCreate, crearEnvio);
+router.put("/:id", verificarToken, verificarRol(["Administrador", "Supervisor"]), validateIdParam, validateEnvioUpdate, actualizarEnvio);
+router.delete("/:id", verificarToken, verificarRol(["Administrador"]), validateIdParam, eliminarEnvio);
 
 export default router;

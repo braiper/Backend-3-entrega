@@ -1,0 +1,21 @@
+extends ../layout
+
+block content
+  .card.col-6(style="margin: 0 auto; margin-top: 50px;")
+    .card-header
+      h1 Iniciar Sesión TechRetail
+    
+    //- Si hay un error al loguearse, lo mostramos acá
+    if error
+      .alert.alert-danger(style="color: red; margin-bottom: 15px;") #{error}
+
+    form(action="/usuarios/login-vista" method="POST")
+      .form-group
+        label Email Corporativo:
+        input(type="email" name="email" required placeholder="tu@techretail.com")
+        
+      .form-group
+        label Contraseña:
+        input(type="password" name="password" required placeholder="Ingresá tu clave")
+        
+      button.btn.btn-primary(type="submit" style="margin-top: 20px; width: 100%;") Ingresar

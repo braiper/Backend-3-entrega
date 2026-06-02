@@ -325,7 +325,14 @@ body
             span TechRetail Solutions
           nav.nav
             a.nav-link(href="/") Inicio
-            a.nav-link(href="/comercios/vista") Comercios
+            if usuario
+              a.nav-link(href="/comercios/vista") Comercios
+              if usuario.rol === 'Administrador' || usuario.rol === 'Supervisor'
+                a.nav-link(href="/alertas/vista" style="color: #f59e0b; font-weight: 600;") 🔔 Alertas
+              span.badge(style="margin-left: 10px;") Hola, #{usuario.nombre} | #{usuario.rol}
+              a.btn.btn-ghost(href="/usuarios/logout-vista" style="margin-left: 15px; color: #ef4444; border-color: #ef444420; background: #ef444405;") Cerrar Sesión
+            else
+              a.btn.btn-primary(href="/usuarios/login-vista" style="margin-left: 10px;") Iniciar Sesión
     main.site-main
       .container
 

@@ -1,5 +1,4 @@
 import express from "express";
-// Importamos las funciones asíncronas con extensión .js
 import {
     obtenerUsuarios,
     obtenerUsuarioPorId,
@@ -9,8 +8,11 @@ import {
     obtenerUsuariosVista,
     formularioNuevoUsuario,
     crearUsuarioVista,
-    loginUsuario
+    loginUsuario,mostrarLogin,procesarLoginVista,
+    logoutVista, logoutApi
 } from "../controllers/usuarios.controller.js";
+import verificarToken from "../middlewares/auth.middleware.js";
+import verificarRol from "../middlewares/role.middleware.js";
 
 const router = express.Router();
 
@@ -65,23 +67,32 @@ const validateUsuarioUpdate = (req, res, next) => {
 };
 
 // GET ALL
-router.get("/", obtenerUsuarios);
-router.get("/vista", obtenerUsuariosVista);
 
-router.get("/nuevo", formularioNuevoUsuario);
+router.get("/login-vista", mostrarLogin);
+router.post("/login-vista", procesarLoginVista);
+router.get("/logout-vista", logoutVista);
+
+
+//router.get("/", obtenerUsuarios);
+router.get("/", verificarToken, verificarRol(["Administrador", "Supervisor"]), obtenerUsuarios); 
+//router.get("/vista", obtenerUsuariosVista);
+router.get("/vista", verificarToken, verificarRol(["Administrador", "Supervisor"]), obtenerUsuariosVista);
+
+router.get("/nuevo", verificarToken, verificarRol(["Administrador"]), formularioNuevoUsuario);
 // GET BY ID
-router.get("/:id", validateIdParam, obtenerUsuarioPorId);
+router.get("/:id", verificarToken, verificarRol(["Administrador", "Supervisor"]), validateIdParam, obtenerUsuarioPorId);
 
 // CREATE
-router.post("/", validateUsuarioCreate, crearUsuario);
-router.post("/vista", validateUsuarioCreate, crearUsuarioVista);
+router.post("/", verificarToken, verificarRol(["Administrador"]), validateUsuarioCreate, crearUsuario);
+router.post("/vista", verificarToken, verificarRol(["Administrador"]), validateUsuarioCreate, crearUsuarioVista);
 router.post("/login", loginUsuario);
+router.post("/logout", logoutApi);
 
 // UPDATE
-router.put("/:id", validateIdParam, validateUsuarioUpdate, actualizarUsuario);
+router.put("/:id", verificarToken, verificarRol(["Administrador"]), validateIdParam, validateUsuarioUpdate, actualizarUsuario);
 
 // DELETE (baja lógica)
-router.delete("/:id", validateIdParam, eliminarUsuario);
+router.delete("/:id", verificarToken, verificarRol(["Administrador"]), validateIdParam, eliminarUsuario);
 
 
 export default router;

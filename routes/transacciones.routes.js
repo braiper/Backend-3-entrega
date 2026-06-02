@@ -10,6 +10,8 @@ import {
     formularioNuevaTransaccion,
     crearTransaccionVista
 } from "../controllers/transacciones.controller.js";
+import verificarToken from "../middlewares/auth.middleware.js";
+import verificarRol from "../middlewares/role.middleware.js";
 
 const router = express.Router();
 
@@ -112,18 +114,18 @@ const validateTransaccionUpdate = (req, res, next) => {
 // ==========================================
 // RUTAS PARA LAS VISTAS PUG (Front-end)
 // ==========================================
-router.get("/vista", obtenerTransaccionesVista);
-router.get("/nuevo", formularioNuevaTransaccion);
-router.get("/vista/:id", validateIdParam, obtenerTransaccionVista);
-router.post("/vista", validateTransaccionCreate, crearTransaccionVista);
+router.get("/vista", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), obtenerTransaccionesVista);
+router.get("/nuevo", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), formularioNuevaTransaccion);
+router.get("/vista/:id", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), validateIdParam, obtenerTransaccionVista);
+router.post("/vista", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), validateTransaccionCreate, crearTransaccionVista);
 
 // ==========================================
 // RUTAS API REST (Endpoints para Thunder Client)
 // ==========================================
-router.get("/", obtenerTransacciones);
-router.get("/:id", validateIdParam, obtenerTransaccionPorId);
-router.post("/", validateTransaccionCreate, crearTransaccion);
-router.put("/:id", validateIdParam, validateTransaccionUpdate, actualizarTransaccion);
-router.delete("/:id", validateIdParam, eliminarTransaccion);
+router.get("/", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), obtenerTransacciones);
+router.get("/:id", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), validateIdParam, obtenerTransaccionPorId);
+router.post("/", verificarToken, verificarRol(["Administrador", "Supervisor", "Operador"]), validateTransaccionCreate, crearTransaccion);
+router.put("/:id", verificarToken, verificarRol(["Administrador", "Supervisor"]), validateIdParam, validateTransaccionUpdate, actualizarTransaccion);
+router.delete("/:id", verificarToken, verificarRol(["Administrador"]), validateIdParam, eliminarTransaccion);
 
 export default router;
