@@ -12,7 +12,9 @@ block content
           th Tienda Asociada
           th Monto Total
           th Monto Pasarela
+          th Estado Pago
           th Estado Conciliación
+          th Cancelación
           th Observación
       tbody
         each transaccion in transacciones
@@ -28,12 +30,28 @@ block content
             td= transaccion.monto_total
             td= transaccion.monto_informado_pasarela
             td
+              - const estadoPago = (transaccion.estado_pago ?? "").toString()
+              - const estadoPagoLower = estadoPago.toLowerCase()
+              if estadoPagoLower.includes("aprob")
+                span.badge.badge-success= estadoPago
+              else if estadoPagoLower.includes("rech")
+                span.badge.badge-danger= estadoPago
+              else
+                span.badge= estadoPago
+            td
               - const estado = (transaccion.estado_conciliacion ?? "").toString()
               - const estadoLower = estado.toLowerCase()
               if estadoLower.includes("ok")
                 span.badge.badge-success= estado
               else if estadoLower.includes("incons") || estadoLower.includes("difer") || estadoLower.includes("problema")
                 span.badge.badge-danger= estado
+              else if estadoLower.includes("anulad")
+                span.badge(style="background: #fee2e2; color: #b91c1c;")= estado
               else
                 span.badge= estado
+            td
+              if transaccion.solicitud_cancelacion
+                span.badge(style="background: #fef3c7; color: #b45309;") Solicitada
+              else
+                span.badge No
             td.small= transaccion.observacion

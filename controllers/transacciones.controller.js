@@ -3,6 +3,255 @@ import Tienda from "../models/tienda.model.js";
 import Comercio from "../models/comercio.model.js";
 import Alerta from "../models/alerta.model.js";
 
+const ALERT_TYPES = ["Financiera", "Pasarela", "Sistema"];
+
+const formatMoney = (value) => Number(value || 0).toFixed(2);
+
+const buildObservacionAutomatica = ({
+    observacion,
+    estadoConciliacion,
+    estadoPago,
+    solicitudCancelacion
+}) => {
+    if (typeof observacion === "string" && observacion.trim()) {
+        return observacion.trim();
+    }
+
+    const mensajes = [];
+
+    if (estadoPago === "Rechazado") {
+        mensajes.push("Pago rechazado por la pasarela");
+    }
+
+    if (estadoConciliacion === "Con Diferencias") {
+        mensajes.push("Revisar discrepancia entre venta y pasarela");
+    } else if (estadoConciliacion === "Conciliado OK") {
+        mensajes.push("Sin diferencias en el flujo monetario");
+    }
+
+    if (estadoConciliacion === "Anulada") {
+        mensajes.push("Venta anulada por decision operativa");
+    } else if (solicitudCancelacion) {
+        mensajes.push("Solicitud de cancelacion pendiente de revision");
+    }
+
+    return mensajes.join(" | ");
+};
+
+const determinarEstadoConciliacion = ({
+    montoTotal,
+    montoInformadoPasarela,
+    estadoConciliacionForzado
+}) => {
+    if (estadoConciliacionForzado) {
+        return estadoConciliacionForzado;
+    }
+
+    if (montoInformadoPasarela !== undefined && montoInformadoPasarela !== null) {
+        return Number(montoTotal) === Number(montoInformadoPasarela)
+            ? "Conciliado OK"
+            : "Con Diferencias";
+    }
+
+    return "Pendiente";
+};
+
+const obtenerTiendaYComercio = async (tiendaId) => {
+    const tienda = await Tienda.findById(tiendaId);
+    if (!tienda) {
+        return { error: "La tienda indicada no existe." };
+    }
+
+    const comercio = await Comercio.findById(tienda.comercio_id);
+    if (!comercio) {
+        return { error: "El comercio asociado no existe." };
+    }
+
+    return { tienda, comercio };
+};
+
+const construirPayloadTransaccion = ({
+    tienda,
+    comercio,
+    montoTotal,
+    montoInformadoPasarela,
+    estadoPago = "Aprobado",
+    solicitudCancelacion = false,
+    observacion = "",
+    estadoConciliacionForzado
+}) => {
+    const comisionCalculada = Number(montoTotal) * comercio.comision_variable;
+    const ingresoCalculado = Number(montoTotal) - comisionCalculada;
+    const estadoConciliacion = determinarEstadoConciliacion({
+        montoTotal,
+        montoInformadoPasarela,
+        estadoConciliacionForzado
+    });
+    const observacionFinal = buildObservacionAutomatica({
+        observacion,
+        estadoConciliacion,
+        estadoPago,
+        solicitudCancelacion
+    });
+
+    return {
+        tienda_id: tienda._id,
+        comercio_id: comercio._id,
+        monto_total: Number(montoTotal),
+        monto_informado_pasarela: Number(montoInformadoPasarela),
+        estado_pago: estadoPago,
+        solicitud_cancelacion: solicitudCancelacion,
+        split_pagos: {
+            comision_techretail: comisionCalculada,
+            ingreso_comercio: ingresoCalculado
+        },
+        estado_conciliacion: estadoConciliacion,
+        observacion: observacionFinal
+    };
+};
+
+const upsertAlertaPendiente = async ({ tipo, mensaje, prioridad, transaccionId }) => {
+    const alertaExistente = await Alerta.findOne({
+        tipo,
+        transaccion_id: transaccionId,
+        estado: "Pendiente"
+    });
+
+    if (alertaExistente) {
+        alertaExistente.mensaje = mensaje;
+        alertaExistente.prioridad = prioridad;
+        alertaExistente.fecha = new Date();
+        await alertaExistente.save();
+        return alertaExistente;
+    }
+
+    return Alerta.create({
+        tipo,
+        mensaje,
+        estado: "Pendiente",
+        prioridad,
+        transaccion_id: transaccionId
+    });
+};
+
+const resolverAlertasPendientes = async (transaccionId, tipo) => {
+    await Alerta.updateMany(
+        { transaccion_id: transaccionId, tipo, estado: "Pendiente" },
+        { estado: "Resuelta" }
+    );
+};
+
+const sincronizarAlertasAutomaticas = async (transaccion, tiendaNombre = "Sin tienda") => {
+    const alertasDeseadas = [];
+
+    if (transaccion.estado_conciliacion === "Con Diferencias") {
+        alertasDeseadas.push({
+            tipo: "Financiera",
+            prioridad: "Alta",
+            mensaje: `Discrepancia detectada en transaccion de tienda ${tiendaNombre}. Total: $${formatMoney(transaccion.monto_total)} vs Pasarela: $${formatMoney(transaccion.monto_informado_pasarela)}.`
+        });
+    }
+
+    if (transaccion.estado_pago === "Rechazado") {
+        alertasDeseadas.push({
+            tipo: "Pasarela",
+            prioridad: "Alta",
+            mensaje: `Pago rechazado por la pasarela en la transaccion de tienda ${tiendaNombre} por $${formatMoney(transaccion.monto_total)}.`
+        });
+    }
+
+    if (transaccion.estado_conciliacion === "Anulada" || transaccion.solicitud_cancelacion) {
+        const anulada = transaccion.estado_conciliacion === "Anulada";
+        alertasDeseadas.push({
+            tipo: "Sistema",
+            prioridad: anulada ? "Alta" : "Media",
+            mensaje: anulada
+                ? `La transaccion de tienda ${tiendaNombre} fue anulada y requiere seguimiento operativo.`
+                : `Se solicito la cancelacion de la transaccion de tienda ${tiendaNombre} por $${formatMoney(transaccion.monto_total)}.`
+        });
+    }
+
+    const tiposDeseados = new Set(alertasDeseadas.map((alerta) => alerta.tipo));
+
+    await Promise.all(
+        ALERT_TYPES.map((tipo) =>
+            tiposDeseados.has(tipo)
+                ? Promise.resolve()
+                : resolverAlertasPendientes(transaccion._id, tipo)
+        )
+    );
+
+    await Promise.all(
+        alertasDeseadas.map((alerta) =>
+            upsertAlertaPendiente({
+                ...alerta,
+                transaccionId: transaccion._id
+            })
+        )
+    );
+};
+
+const crearTransaccionInterna = async (body) => {
+    const {
+        tienda_id,
+        monto_total,
+        monto_informado_pasarela,
+        observacion,
+        estado_pago = "Aprobado",
+        solicitud_cancelacion = false
+    } = body;
+
+    const { tienda, comercio, error } = await obtenerTiendaYComercio(tienda_id);
+    if (error) {
+        return { error };
+    }
+
+    const payload = construirPayloadTransaccion({
+        tienda,
+        comercio,
+        montoTotal: monto_total,
+        montoInformadoPasarela: monto_informado_pasarela,
+        estadoPago: estado_pago,
+        solicitudCancelacion: solicitud_cancelacion,
+        observacion
+    });
+
+    const nuevaTransaccion = await Transaccion.create(payload);
+    await sincronizarAlertasAutomaticas(nuevaTransaccion, tienda.nombre_sucursal);
+
+    return { transaccion: nuevaTransaccion };
+};
+
+const actualizarTransaccionInterna = async (id, body) => {
+    const transaccionActual = await Transaccion.findById(id);
+    if (!transaccionActual) {
+        return { notFound: true };
+    }
+
+    const tiendaId = body.tienda_id || transaccionActual.tienda_id;
+    const { tienda, comercio, error } = await obtenerTiendaYComercio(tiendaId);
+    if (error) {
+        return { error };
+    }
+
+    const payload = construirPayloadTransaccion({
+        tienda,
+        comercio,
+        montoTotal: body.monto_total ?? transaccionActual.monto_total,
+        montoInformadoPasarela: body.monto_informado_pasarela ?? transaccionActual.monto_informado_pasarela,
+        estadoPago: body.estado_pago ?? transaccionActual.estado_pago ?? "Aprobado",
+        solicitudCancelacion: body.solicitud_cancelacion ?? transaccionActual.solicitud_cancelacion ?? false,
+        observacion: body.observacion ?? transaccionActual.observacion,
+        estadoConciliacionForzado: body.estado_conciliacion
+    });
+
+    Object.assign(transaccionActual, payload);
+    await transaccionActual.save();
+    await sincronizarAlertasAutomaticas(transaccionActual, tienda.nombre_sucursal);
+
+    return { transaccion: transaccionActual };
+};
+
 // ==========================================
 // RUTAS API CRUD CON MONGODB
 // ==========================================
@@ -34,68 +283,12 @@ const obtenerTransaccionPorId = async (req, res) => {
 // CREATE: Con lógica de negocio (Cálculo de comisiones y conciliación)
 const crearTransaccion = async (req, res) => {
     try {
-        const { tienda_id, monto_total, monto_informado_pasarela, observacion } = req.body;
-
-        // 1. Validar que la tienda exista en MongoDB
-        const tienda = await Tienda.findById(tienda_id);
-        if (!tienda) {
-            return res.status(404).json({ error: "La tienda indicada no existe." });
+        const resultado = await crearTransaccionInterna(req.body);
+        if (resultado.error) {
+            return res.status(404).json({ error: resultado.error });
         }
 
-        // 2. Traer el comercio dueño para saber su % de comisión
-        const comercio = await Comercio.findById(tienda.comercio_id);
-        if (!comercio) {
-            return res.status(404).json({ error: "El comercio asociado no existe." });
-        }
-
-        // 3. Cálculos matemáticos del Split de Pagos
-        const comisionCalculada = monto_total * comercio.comision_variable;
-        const ingresoCalculado = monto_total - comisionCalculada;
-
-        // 4. Lógica de Conciliación Automática
-        let estadoConciliacion = "Pendiente";
-        let observacionFinal = observacion || "";
-
-        if (monto_informado_pasarela !== undefined) {
-            if (Number(monto_total) === Number(monto_informado_pasarela)) {
-                estadoConciliacion = "Conciliado OK";
-                if (!observacionFinal) observacionFinal = "Sin diferencias en el flujo monetario";
-            } else {
-                estadoConciliacion = "Con Diferencias";
-                if (!observacionFinal) observacionFinal = "Revisar discrepancia entre venta y pasarela";
-            }
-        }
-
-        // 5. Armar el documento final y guardarlo
-        const nuevaTransaccion = new Transaccion({
-            tienda_id: tienda._id,
-            comercio_id: comercio._id,
-            monto_total,
-            monto_informado_pasarela,
-            split_pagos: {
-                comision_techretail: comisionCalculada,
-                ingreso_comercio: ingresoCalculado
-            },
-            estado_conciliacion: estadoConciliacion,
-            observacion: observacionFinal
-        });
-
-        await nuevaTransaccion.save();
-
-        // 6. Si hubo diferencias, disparar una Alerta en el sistema
-        if (estadoConciliacion === "Con Diferencias") {
-            const nuevaAlerta = new Alerta({
-                tipo: "Financiera",
-                mensaje: `Discrepancia detectada en transacción de tienda ${tienda.nombre_sucursal}. Total: $${monto_total} vs Pasarela: $${monto_informado_pasarela}.`,
-                estado: "Pendiente",
-                prioridad: "Alta",
-                transaccion_id: nuevaTransaccion._id
-            });
-            await nuevaAlerta.save();
-        }
-
-        res.status(201).json(nuevaTransaccion);
-
+        res.status(201).json(resultado.transaccion);
     } catch (error) {
         console.log(error); // Para ver detalles en la terminal si algo falla
         res.status(400).json({ error: "Error al crear la transacción. Verificá los datos." });
@@ -105,15 +298,13 @@ const crearTransaccion = async (req, res) => {
 // UPDATE
 const actualizarTransaccion = async (req, res) => {
     try {
-        const transaccionActualizada = await Transaccion.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true, runValidators: true } 
-        );
-        if (transaccionActualizada) {
-            res.json(transaccionActualizada);
-        } else {
+        const resultado = await actualizarTransaccionInterna(req.params.id, req.body);
+        if (resultado.notFound) {
             res.status(404).json({ error: "Transacción no encontrada" });
+        } else if (resultado.error) {
+            res.status(404).json({ error: resultado.error });
+        } else {
+            res.json(resultado.transaccion);
         }
     } catch (error) {
         res.status(400).json({ error: "Error al actualizar la transacción" });
@@ -123,15 +314,16 @@ const actualizarTransaccion = async (req, res) => {
 // DELETE (Baja Lógica / Anulación)
 const eliminarTransaccion = async (req, res) => {
     try {
-        const transaccionEliminada = await Transaccion.findByIdAndUpdate(
-            req.params.id,
-            { estado_conciliacion: "Anulada" }, // Marcamos como Anulada
-            { new: true }
-        );
-        if (transaccionEliminada) {
-            res.json({ mensaje: "Transacción anulada", transaccion: transaccionEliminada });
-        } else {
+        const resultado = await actualizarTransaccionInterna(req.params.id, {
+            estado_conciliacion: "Anulada",
+            solicitud_cancelacion: true
+        });
+        if (resultado.notFound) {
             res.status(404).json({ error: "Transacción no encontrada" });
+        } else if (resultado.error) {
+            res.status(404).json({ error: resultado.error });
+        } else {
+            res.json({ mensaje: "Transacción anulada", transaccion: resultado.transaccion });
         }
     } catch (error) {
         res.status(500).json({ error: "Error al anular la transacción" });
@@ -178,82 +370,9 @@ const formularioNuevaTransaccion = async (req, res) => {
 
 const crearTransaccionVista = async (req, res) => {
     try {
-        const { tienda_id, monto_total, monto_informado_pasarela, observacion } = req.body;
-
-        const tienda = await Tienda.findById(tienda_id);
-
-        if (!tienda) {
-            return res.status(404).send("La tienda indicada no existe.");
-        }
-
-        const comercio = await Comercio.findById(tienda.comercio_id);
-
-        if (!comercio) {
-            return res.status(404).send("El comercio asociado no existe.");
-        }
-
-        const comisionCalculada =
-            monto_total * comercio.comision_variable;
-
-        const ingresoCalculado =
-            monto_total - comisionCalculada;
-
-        let estadoConciliacion = "Pendiente";
-
-        let observacionFinal = observacion || "";
-
-        if (monto_informado_pasarela !== undefined) {
-
-            if (
-                Number(monto_total) ===
-                Number(monto_informado_pasarela)
-            ) {
-
-                estadoConciliacion = "Conciliado OK";
-
-                if (!observacionFinal) {
-                    observacionFinal =
-                        "Sin diferencias en el flujo monetario";
-                }
-
-            } else {
-
-                estadoConciliacion = "Con Diferencias";
-
-                if (!observacionFinal) {
-                    observacionFinal =
-                        "Revisar discrepancia entre venta y pasarela";
-                }
-            }
-        }
-
-        const nuevaTransaccion = new Transaccion({
-            tienda_id: tienda._id,
-            comercio_id: comercio._id,
-            monto_total,
-            monto_informado_pasarela,
-
-            split_pagos: {
-                comision_techretail: comisionCalculada,
-                ingreso_comercio: ingresoCalculado
-            },
-
-            estado_conciliacion: estadoConciliacion,
-            observacion: observacionFinal
-        });
-
-        await nuevaTransaccion.save();
-
-        // Si hubo diferencias, generar la Alerta automáticamente para el panel
-        if (estadoConciliacion === "Con Diferencias") {
-            const nuevaAlerta = new Alerta({
-                tipo: "Financiera",
-                mensaje: `Discrepancia detectada en transacción de tienda ${tienda.nombre_sucursal}. Total: $${monto_total} vs Pasarela: $${monto_informado_pasarela}.`,
-                estado: "Pendiente",
-                prioridad: "Alta",
-                transaccion_id: nuevaTransaccion._id
-            });
-            await nuevaAlerta.save();
+        const resultado = await crearTransaccionInterna(req.body);
+        if (resultado.error) {
+            return res.status(404).send(resultado.error);
         }
 
         res.redirect("/transacciones/vista");
@@ -278,5 +397,7 @@ export {
     obtenerTransaccionesVista,
     obtenerTransaccionVista,
     formularioNuevaTransaccion,
-    crearTransaccionVista
+    crearTransaccionVista,
+    buildObservacionAutomatica,
+    determinarEstadoConciliacion
 };

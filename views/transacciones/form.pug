@@ -21,6 +21,21 @@ block content
       .form-group
         label Monto Informado por Pasarela:
         input(type="number" name="monto_informado_pasarela" required)
-        
-      
+
+      .form-group
+        label Estado del Pago:
+        select(name="estado_pago" required)
+          option(value="Aprobado" selected) Aprobado
+          option(value="Pendiente") Pendiente
+          option(value="Rechazado") Rechazado
+
+      .form-group
+        label(for="solicitud_cancelacion")
+          input#solicitud_cancelacion(type="checkbox" name="solicitud_cancelacion" value="true" style="width: auto; margin-right: 8px;")
+          | Marcar si ya existe un pedido de cancelación
+
+      .form-group
+        label Observación:
+        textarea(name="observacion" rows="4" placeholder="Dato extra para el equipo operativo o financiero")
+
       button.btn.btn-primary(type="submit" style="margin-top: 20px;") Procesar Venta

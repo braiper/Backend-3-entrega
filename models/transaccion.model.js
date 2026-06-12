@@ -20,6 +20,15 @@ const transaccionSchema = new mongoose.Schema({
         required: true,
         min: 0
     },
+    estado_pago: {
+        type: String,
+        default: "Aprobado",
+        enum: ["Pendiente", "Aprobado", "Rechazado"]
+    },
+    solicitud_cancelacion: {
+        type: Boolean,
+        default: false
+    },
     split_pagos: {
         comision_techretail: { type: Number, default: 0, min: 0 },
         ingreso_comercio: { type: Number, default: 0 }

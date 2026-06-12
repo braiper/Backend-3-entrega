@@ -2,68 +2,143 @@ extends layout
 
 block content
   .grid
-    //- Encabezado principal del Panel
+    .card.col-12.hero-panel
+      .hero-panel__content
+        div
+          span.badge Panel del dia
+          h1(style="margin-top: 12px;") Hola, #{panel.saludo}
+          p(style="max-width: 720px; margin-bottom: 0;") #{panel.resumenDia}
+        .hero-panel__summary
+          if panel.estadoGeneral.tone === "danger"
+            span.badge.badge-danger #{panel.estadoGeneral.label}
+          else if panel.estadoGeneral.tone === "warning"
+            span.badge(style="background: rgba(245, 158, 11, .12); color: #92400e; border-color: rgba(245, 158, 11, .22);") #{panel.estadoGeneral.label}
+          else if panel.estadoGeneral.tone === "success"
+            span.badge.badge-success #{panel.estadoGeneral.label}
+          else
+            span.badge #{panel.estadoGeneral.label}
+          h3(style="margin-top: 14px; margin-bottom: 6px;") Rol actual: #{panel.rol}
+          p.muted(style="margin-bottom: 0;") #{panel.estadoGeneral.detail}
+
+    .card.col-3.kpi-card
+      .kpi-card__top
+        span.icon-chip CM
+        span.badge Activos
+      p.kpi-card__label Comercios
+      h2.kpi-card__value #{panel.kpis.comerciosActivos}
+
+    .card.col-3.kpi-card
+      .kpi-card__top
+        span.icon-chip TD
+        span.badge Activas
+      p.kpi-card__label Tiendas
+      h2.kpi-card__value #{panel.kpis.tiendasActivas}
+
+    .card.col-3.kpi-card
+      .kpi-card__top
+        span.icon-chip TX
+        span.badge Hoy
+      p.kpi-card__label Ventas del dia
+      h2.kpi-card__value #{panel.kpis.ventasHoy}
+      p.muted(style="margin-bottom: 0;") Volumen: #{panel.volumenHoy}
+
+    .card.col-3.kpi-card
+      .kpi-card__top
+        span.icon-chip AL
+        if panel.alertasCriticas > 0
+          span.badge.badge-danger Criticas: #{panel.alertasCriticas}
+        else
+          span.badge Pendientes
+      p.kpi-card__label Alertas abiertas
+      h2.kpi-card__value #{panel.kpis.alertasAbiertas}
+
     .card.col-12
       .card-header
         div
-          h1 Panel principal
-          p.muted Administración de módulos y operaciones del sistema.
+          h2 Accesos rapidos
+          p.muted Tareas frecuentes para el equipo operativo.
+      .actions
+        a.btn.btn-primary(href="/transacciones/nuevo") Procesar venta
+        a.btn.btn-ghost(href="/logistica/nuevo") Crear envio
+        a.btn.btn-ghost(href="/comercios/nuevo") Nuevo comercio
+        a.btn.btn-ghost(href="/alertas/vista") Ver alertas
 
-    //- 1. Módulo Comercios
-    .card.col-6
-      .card-header
+    .card.col-4.module-card
+      .module-card__title
+        span.icon-chip CM
         div
           h2 Comercios
-          p.muted Gestión de comercios adheridos a la plataforma.
+          p.muted Gestion de comercios adheridos a la plataforma.
       .actions
-        a.btn.btn-primary(href="/comercios/vista") Ver listado
-        a.btn.btn-ghost(href="/comercios/nuevo") Registrar nuevo
+        a.btn.btn-primary(href="/comercios/vista") Abrir modulo
+        a.btn.btn-ghost(href="/comercios/nuevo") Nuevo comercio
 
-    //- 2. Módulo Tiendas
-    .card.col-6
-      .card-header
+    .card.col-4.module-card
+      .module-card__title
+        span.icon-chip TD
         div
           h2 Tiendas
-          p.muted Gestión de sucursales virtuales por comercio.
+          p.muted Gestion de sucursales virtuales por comercio.
       .actions
-        a.btn.btn-primary(href="/tiendas/vista") Ver listado
-        a.btn.btn-ghost(href="/tiendas/nuevo") Registrar nueva
+        a.btn.btn-primary(href="/tiendas/vista") Abrir modulo
+        a.btn.btn-ghost(href="/tiendas/nuevo") Nueva tienda
 
-    //- 3. Módulo Transacciones
-    .card.col-6
-      .card-header
+    .card.col-4.module-card
+      .module-card__title
+        span.icon-chip TX
         div
           h2 Transacciones
-          p.muted Procesamiento de ventas y cálculo de comisiones.
+          p.muted Ventas, conciliacion y comisiones de la plataforma.
       .actions
-        a.btn.btn-primary(href="/transacciones/vista") Ver listado
+        a.btn.btn-primary(href="/transacciones/vista") Abrir modulo
         a.btn.btn-ghost(href="/transacciones/nuevo") Procesar venta
 
-    //- 4. Módulo Logística
-    .card.col-6
-      .card-header
+    .card.col-4.module-card
+      .module-card__title
+        span.icon-chip LG
         div
-          h2 Logística
-          p.muted Gestión de envíos validados contra transacciones.
+          h2 Logistica
+          p.muted Envios vinculados con el flujo de ventas y despacho.
       .actions
-        a.btn.btn-primary(href="/logistica/vista") Ver listado
-        a.btn.btn-ghost(href="/logistica/nuevo") Crear envío
+        a.btn.btn-primary(href="/logistica/vista") Abrir modulo
+        a.btn.btn-ghost(href="/logistica/nuevo") Crear envio
 
-    //- 5. Módulo Usuarios
-    .card.col-6
-      .card-header
+    .card.col-4.module-card
+      .module-card__title
+        span.icon-chip US
         div
           h2 Usuarios
-          p.muted Administración del personal interno del sistema.
+          p.muted Administracion del personal y permisos del sistema.
       .actions
-        a.btn.btn-primary(href="/usuarios/vista") Ver listado
-        a.btn.btn-ghost(href="/usuarios/nuevo") Registrar nuevo
+        a.btn.btn-primary(href="/usuarios/vista") Abrir modulo
+        a.btn.btn-ghost(href="/usuarios/nuevo") Nuevo usuario
 
-    //- 6. Módulo Estadísticas
-    .card.col-6
-      .card-header
+    .card.col-4.module-card
+      .module-card__title
+        span.icon-chip TS
         div
-          h2 Reporte Hot Sale
-          p.muted Métricas financieras y estado de la pasarela.
+          h2 Tests y salud
+          p.muted Controles tecnicos y verificacion rapida del entorno.
       .actions
-        a.btn.btn-primary(href="/estadisticas/vista") Ver Reporte
+        a.btn.btn-primary(href="/tests/health") Health check
+        a.btn.btn-ghost(href="/tests") Ver pruebas
+
+    .card.col-6.module-card.module-card--report
+      .module-card__title
+        span.icon-chip RP
+        div
+          h2 Reportes destacados
+          p.muted Seguimiento del periodo, comparativas y estado de la operacion.
+      p(style="margin-bottom: 14px;") Revisá métricas financieras, ticket promedio y evolucion del periodo con filtros por fecha.
+      .actions
+        a.btn.btn-primary(href="/estadisticas/vista") Ver reportes
+
+    .card.col-6.module-card.module-card--alert
+      .module-card__title
+        span.icon-chip AL
+        div
+          h2 Alertas destacadas
+          p.muted Prioridad visual para incidentes, diferencias y tickets pendientes.
+      p(style="margin-bottom: 14px;") Tenés #{panel.kpis.alertasAbiertas} alerta(s) pendiente(s) y #{panel.alertasCriticas} critica(s) para seguimiento.
+      .actions
+        a.btn.btn-primary(href="/alertas/vista") Abrir alertas

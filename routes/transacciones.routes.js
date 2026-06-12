@@ -20,6 +20,18 @@ const sendValidationError = (res, errors) => res.status(400).json({ errors });
 const isNonEmptyString = (value) => typeof value === "string" && value.trim().length > 0;
 
 const isValidObjectIdString = (value) => typeof value === "string" && /^[a-fA-F0-9]{24}$/.test(value);
+const allowedEstadoPago = ["Pendiente", "Aprobado", "Rechazado"];
+const allowedEstadoConciliacion = ["Pendiente", "Conciliado OK", "Con Diferencias", "Anulada"];
+
+const parseBooleanValue = (value) => {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "string") {
+        const normalized = value.trim().toLowerCase();
+        if (["true", "1", "on", "si", "sí"].includes(normalized)) return true;
+        if (["false", "0", "off", "no", ""].includes(normalized)) return false;
+    }
+    return null;
+};
 
 const validateIdParam = (req, res, next) => {
     if (!isValidObjectIdString(req.params.id)) {
@@ -56,8 +68,35 @@ const validateTransaccionCreate = (req, res, next) => {
         req.body.monto_informado_pasarela = montoPasarela;
     }
 
+    if ("estado_pago" in req.body) {
+        if (!allowedEstadoPago.includes(req.body.estado_pago)) {
+            errors.push({
+                field: "estado_pago",
+                message: `estado_pago debe ser uno de: ${allowedEstadoPago.join(", ")}.`,
+            });
+        }
+    } else {
+        req.body.estado_pago = "Aprobado";
+    }
+
+    if ("solicitud_cancelacion" in req.body) {
+        const solicitudCancelacion = parseBooleanValue(req.body.solicitud_cancelacion);
+        if (solicitudCancelacion === null) {
+            errors.push({
+                field: "solicitud_cancelacion",
+                message: "solicitud_cancelacion debe ser booleana.",
+            });
+        } else {
+            req.body.solicitud_cancelacion = solicitudCancelacion;
+        }
+    } else {
+        req.body.solicitud_cancelacion = false;
+    }
+
     if ("observacion" in req.body && req.body.observacion !== undefined && req.body.observacion !== null) {
-        if (!isNonEmptyString(req.body.observacion)) {
+        if (typeof req.body.observacion === "string" && req.body.observacion.trim() === "") {
+            delete req.body.observacion;
+        } else if (!isNonEmptyString(req.body.observacion)) {
             errors.push({ field: "observacion", message: "observacion, si se envía, no puede estar vacía." });
         }
     }
@@ -101,8 +140,36 @@ const validateTransaccionUpdate = (req, res, next) => {
         }
     }
 
+    if ("estado_pago" in req.body && !allowedEstadoPago.includes(req.body.estado_pago)) {
+        errors.push({
+            field: "estado_pago",
+            message: `estado_pago debe ser uno de: ${allowedEstadoPago.join(", ")}.`,
+        });
+    }
+
+    if ("estado_conciliacion" in req.body && !allowedEstadoConciliacion.includes(req.body.estado_conciliacion)) {
+        errors.push({
+            field: "estado_conciliacion",
+            message: `estado_conciliacion debe ser uno de: ${allowedEstadoConciliacion.join(", ")}.`,
+        });
+    }
+
+    if ("solicitud_cancelacion" in req.body) {
+        const solicitudCancelacion = parseBooleanValue(req.body.solicitud_cancelacion);
+        if (solicitudCancelacion === null) {
+            errors.push({
+                field: "solicitud_cancelacion",
+                message: "solicitud_cancelacion debe ser booleana.",
+            });
+        } else {
+            req.body.solicitud_cancelacion = solicitudCancelacion;
+        }
+    }
+
     if ("observacion" in req.body && req.body.observacion !== undefined && req.body.observacion !== null) {
-        if (!isNonEmptyString(req.body.observacion)) {
+        if (typeof req.body.observacion === "string" && req.body.observacion.trim() === "") {
+            delete req.body.observacion;
+        } else if (!isNonEmptyString(req.body.observacion)) {
             errors.push({ field: "observacion", message: "observacion no puede estar vacía." });
         }
     }
