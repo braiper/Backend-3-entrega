@@ -116,24 +116,28 @@ const crearUsuarioVista = async (req, res) => {
 
 // GET - Renderiza el formulario de Login
 const mostrarLogin = (req, res) => {
-    res.render("usuarios/login");
+    res.render("usuarios/login", { hideHomeLink: true });
 };
 
 // POST - Procesa el formulario, valida y guarda la Cookie
 const procesarLoginVista = async (req, res) => {
     try {
         const { email, password } = req.body;
+        const emailNormalizado = typeof email === "string" ? email.trim().toLowerCase() : "";
 
         // 1. Buscamos el usuario
-        const usuarioEncontrado = await Usuario.findOne({ email: email });
+        const usuarioEncontrado = await Usuario.findOne({ email: emailNormalizado });
         if (!usuarioEncontrado) {
-            return res.render("usuarios/login", { error: "El correo o la clave son incorrectos" });
+            return res.render("usuarios/login", { error: "El correo o la clave son incorrectos", hideHomeLink: true });
+        }
+        if (!usuarioEncontrado.password) {
+            return res.render("usuarios/login", { error: "El usuario no tiene una contraseña configurada", hideHomeLink: true });
         }
 
         // 2. Comparamos contraseñas con bcrypt
         const passwordValida = await bcrypt.compare(password, usuarioEncontrado.password);
         if (!passwordValida) {
-            return res.render("usuarios/login", { error: "El correo o la clave son incorrectos" });
+            return res.render("usuarios/login", { error: "El correo o la clave son incorrectos", hideHomeLink: true });
         }
 
         // 3. Generamos el pase VIP (JWT)
@@ -153,7 +157,7 @@ const procesarLoginVista = async (req, res) => {
         res.redirect("/usuarios/vista");
 
     } catch (error) {
-        res.render("usuarios/login", { error: "Ocurrió un error en el servidor" });
+        res.render("usuarios/login", { error: "Ocurrió un error en el servidor", hideHomeLink: true });
     }
 };
 
@@ -171,12 +175,16 @@ const loginUsuario = async (req, res) => {
     try {
         // 1. Recibimos el email y la clave en texto plano desde el formulario o Thunder Client
         const { email, password } = req.body;
+        const emailNormalizado = typeof email === "string" ? email.trim().toLowerCase() : "";
 
         // 2. Buscamos en la base de datos si existe algún usuario con ese email exacto
-        const usuarioEncontrado = await Usuario.findOne({ email: email });
+        const usuarioEncontrado = await Usuario.findOne({ email: emailNormalizado });
         
         if (!usuarioEncontrado) {
             return res.status(404).json({ error: "El usuario no existe en el sistema" });
+        }
+        if (!usuarioEncontrado.password) {
+            return res.status(409).json({ error: "El usuario no tiene una contraseña configurada" });
         }
 
         // 3. Comparamos la contraseña en texto plano con el hash guardado usando bcrypt.compare()

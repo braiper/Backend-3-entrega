@@ -3,26 +3,142 @@ extends ../layout
 block content
   .card.col-12
     .card-header
-      h1 Reporte Estadístico Hot Sale
+      div
+        h1= reporte.evento
+        p.muted(style="margin: 0;") Periodo analizado: #{reporte.rangoActual.etiqueta}
       a.btn.btn-ghost(href="/") Volver al Panel
     
     .card-body(style="padding: 20px;")
-      ul(style="list-style: none; font-size: 18px; line-height: 2;")
-        li 
-          strong Evento: 
-          | #{reporte.evento}
-        li 
-          strong Ventas Totales: 
-          | #{reporte.ventasTotales} operaciones
-        li 
-          strong Volumen Movido: 
-          | $#{reporte.volumenMovido}
-        li 
-          strong Ganancia Plataforma: 
-          | $#{reporte.gananciaPlataforma}
-        li 
-          strong Tasa de Error: 
-          | #{reporte.tasaError}
-        li 
-          strong Estado del Sistema: 
-          | #{reporte.estadoSistema}
+      form.card(method="GET" action="/estadisticas/vista" style="margin-bottom: 18px;")
+        .card-header(style="margin-bottom: 10px;")
+          h2(style="margin-bottom: 0;") Filtros de fecha
+          span.badge Compara contra el periodo anterior
+        .grid
+          .col-6
+            label(for="desde")
+              strong Desde
+            input#desde(type="date" name="desde" value=reporte.filtros.desde style="width: 100%; margin-top: 8px;")
+          .col-6
+            label(for="hasta")
+              strong Hasta
+            input#hasta(type="date" name="hasta" value=reporte.filtros.hasta style="width: 100%; margin-top: 8px;")
+        .actions(style="margin-top: 14px;")
+          button.btn.btn-primary(type="submit") Aplicar filtros
+          a.btn(href="/estadisticas/vista") Reiniciar
+
+      .grid(style="margin-bottom: 18px;")
+        .col-6
+          .card
+            h3(style="margin-bottom: 6px;") Periodo actual
+            p(style="margin-bottom: 0;") #{reporte.rangoActual.etiqueta}
+        .col-6
+          .card
+            h3(style="margin-bottom: 6px;") Comparado contra
+            p(style="margin-bottom: 0;") #{reporte.rangoAnterior.etiqueta}
+
+      .grid(style="margin-bottom: 18px;")
+        .col-6
+          .card
+            span.badge Ventas Totales
+            h2(style="margin-top: 10px;") #{reporte.resumenVista.ventasTotales}
+        .col-6
+          .card
+            span.badge Volumen Movido
+            h2(style="margin-top: 10px;") #{reporte.resumenVista.volumenMovido}
+        .col-6
+          .card
+            span.badge Ganancia Plataforma
+            h2(style="margin-top: 10px;") #{reporte.resumenVista.gananciaPlataforma}
+        .col-6
+          .card
+            span.badge Tasa de Error
+            h2(style="margin-top: 10px;") #{reporte.resumenVista.tasaError}
+        .col-6
+          .card
+            span.badge Ticket Promedio
+            h2(style="margin-top: 10px;") #{reporte.resumenVista.ticketPromedio}
+        .col-6
+          .card
+            span.badge Estado del Sistema
+            h2(style="margin-top: 10px; font-size: 22px;") #{reporte.resumen.estadoSistema}
+            p.muted(style="margin-bottom: 0;") Errores detectados: #{reporte.resumen.errores}
+
+      .chart-grid(style="margin-bottom: 18px;")
+        .chart-col-7
+          .card
+            .card-header
+              h2 Gráfico comparativo
+              span.badge Barras simples
+            .chart-stack
+              .bar-legend
+                span
+                  span.legend-dot.legend-dot--actual
+                  |  Periodo actual
+                span
+                  span.legend-dot.legend-dot--anterior
+                  |  Periodo anterior
+              each item in reporte.graficos.comparativasBarras
+                .bar-chart-row
+                  .bar-chart-header
+                    strong #{item.label}
+                    if item.tono === "positive"
+                      span.badge.badge-success Mejorando
+                    else if item.tono === "negative"
+                      span.badge.badge-danger Revisar
+                    else
+                      span.badge Sin cambios
+                  .bar-track
+                    .bar-line
+                      span.bar-fill.bar-fill--actual(style=`width:${item.actualWidth}%`)
+                    .bar-line
+                      span.bar-fill.bar-fill--anterior(style=`width:${item.anteriorWidth}%`)
+                  .bar-chart-header
+                    span.muted Actual: #{item.actual}
+                    span.muted Anterior: #{item.anterior}
+        .chart-col-5
+          .card
+            .card-header
+              h2 Conciliación actual
+              span.badge Distribución
+            .donut-wrap
+              .donut-chart(style=`background: conic-gradient(${reporte.graficos.conciliacion.gradiente})`)
+                .donut-center
+                  strong #{reporte.graficos.conciliacion.total}
+                  span.muted ops
+              .segment-list
+                each segmento in reporte.graficos.conciliacion.segmentos
+                  .segment-item
+                    span.segment-label
+                      span.legend-dot(style=`background:${segmento.color}`)
+                      span #{segmento.label}
+                    span
+                      strong #{segmento.value}
+                      |  (#{segmento.percentage}%)
+
+      .card
+        .card-header
+          h2 Comparativa contra periodo anterior
+          span.badge(style="background: rgba(13, 71, 161, .08); color: #0d47a1;") Vista preliminar
+        table
+          thead
+            tr
+              th Métrica
+              th Actual
+              th Anterior
+              th Variación
+              th Delta
+          tbody
+            each item in reporte.comparativasVista
+              tr
+                td
+                  strong #{item.label}
+                td #{item.valorActual}
+                td #{item.valorAnterior}
+                td
+                  if item.tono === "positive"
+                    span.badge.badge-success #{item.percentageText}
+                  else if item.tono === "negative"
+                    span.badge.badge-danger #{item.percentageText}
+                  else
+                    span.badge #{item.percentageText}
+                td #{item.deltaText}

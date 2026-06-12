@@ -8,7 +8,7 @@ const verificarToken = (req, res, next) => {
     if (!token) {
         const authHeader = req.header("Authorization");
         if (authHeader && authHeader.startsWith("Bearer ")) {
-            token = authHeader.split(" ")[4];
+            token = authHeader.split(" ")[1];
         }
     }
 
