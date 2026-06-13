@@ -1,21 +1,118 @@
 extends ../layout
 
 block content
-  .card.col-6(style="margin: 0 auto; margin-top: 50px;")
-    .card-header
-      h1 Iniciar Sesión TechRetail
-    
-    //- Si hay un error al loguearse, lo mostramos acá
-    if error
-      .alert.alert-danger(style="color: red; margin-bottom: 15px;") #{error}
+  .login-shell
+    .card.login-hero
+      .login-hero__inner
+        .login-hero__brand
+          span.login-hero__logo-mark TR
+          div
+            p.login-hero__eyebrow Plataforma B2B TechRetail
+            h2(style="margin-bottom: 0;") Acceso corporativo seguro
+        span.login-badge
+          | Acceso seguro TechRetail
+        div
+          h1 Ingresá al panel operativo
+          p(style="max-width: 520px; margin-bottom: 0;")
+            | Gestioná comercios, transacciones, alertas y reportes desde una sesión corporativa segura.
+        .login-hero__stats
+          .login-stat
+            strong 24/7
+            span Monitoreo operativo
+          .login-stat
+            strong JWT
+            span Sesión protegida
+          .login-stat
+            strong Live
+            span Alertas y reportes
+        .login-points
+          .login-point
+            span.login-point__dot
+            div
+              strong Monitoreo centralizado
+              p(style="margin: 4px 0 0;")
+                | Seguimiento visual de ventas, conciliación y estado general de la plataforma.
+          .login-point
+            span.login-point__dot
+            div
+              strong Alertas y métricas en un solo lugar
+              p(style="margin: 4px 0 0;")
+                | Accedé rápido a reportes, tickets operativos y desvíos financieros.
+          .login-point
+            span.login-point__dot
+            div
+              strong Sesión corporativa protegida
+              p(style="margin: 4px 0 0;")
+                | El acceso utiliza autenticación segura con expiración automática.
 
-    form(action="/usuarios/login-vista" method="POST")
-      .form-group
-        label Email Corporativo:
-        input(type="email" name="email" required placeholder="tu@techretail.com")
-        
-      .form-group
-        label Contraseña:
-        input(type="password" name="password" required placeholder="Ingresá tu clave")
-        
-      button.btn.btn-primary(type="submit" style="margin-top: 20px; width: 100%;") Ingresar
+    .card.login-card
+      .login-card__header
+        span.badge Iniciar sesión
+        h2(style="margin-bottom: 0;") Bienvenido a TechRetail Solutions
+        p.muted(style="margin-bottom: 0;")
+          | Ingresá con tu correo corporativo para acceder al panel administrativo.
+
+      if error
+        .login-alert
+          span.login-alert__icon !
+          div
+            strong No se pudo iniciar sesión
+            p(style="margin: 2px 0 0; color: inherit;") #{error}
+
+      form#loginForm.login-form(action="/usuarios/login-vista" method="POST")
+        .login-field
+          .login-label
+            label(for="email") Email corporativo
+            span.muted Usá tu cuenta institucional
+          .login-input-wrap
+            span.login-input-icon @
+            input#email.login-input(type="email" name="email" required placeholder="tu@techretail.com" autocomplete="email" value=emailValue)
+
+        .login-field
+          .login-label
+            label(for="password") Contraseña
+            span.muted Mínimo una clave válida registrada
+          .login-input-wrap
+            span.login-input-icon *
+            input#password.login-input(type="password" name="password" required placeholder="Ingresá tu clave" autocomplete="current-password")
+            button#togglePassword.login-password-toggle(type="button" aria-label="Mostrar u ocultar contraseña") Mostrar
+
+        button#loginSubmit.btn.btn-primary.login-submit(type="submit")
+          span#loginSubmitText Ingresar al panel
+
+      .login-helper
+        .login-helper__row
+          div
+            strong ¿Olvidaste tu contraseña?
+            p(style="margin: 4px 0 0;")
+              | Pedile a un administrador que revise tu usuario o restablezca tu acceso corporativo.
+        span.login-inline-note
+          span •
+          | Si tu usuario no tiene clave configurada, el sistema te lo va a informar al intentar ingresar.
+
+      p.login-footnote
+        | Si el acceso falla, verificá tus credenciales o consultá con un administrador para revisar tu usuario.
+
+  script.
+    (() => {
+      const loginForm = document.getElementById("loginForm");
+      const submitButton = document.getElementById("loginSubmit");
+      const submitText = document.getElementById("loginSubmitText");
+      const passwordInput = document.getElementById("password");
+      const toggleButton = document.getElementById("togglePassword");
+
+      if (passwordInput && toggleButton) {
+        toggleButton.addEventListener("click", () => {
+          const showPassword = passwordInput.type === "password";
+          passwordInput.type = showPassword ? "text" : "password";
+          toggleButton.textContent = showPassword ? "Ocultar" : "Mostrar";
+        });
+      }
+
+      if (loginForm && submitButton && submitText) {
+        loginForm.addEventListener("submit", () => {
+          submitButton.classList.add("is-loading");
+          submitText.textContent = "Ingresando...";
+        });
+      }
+    })();
